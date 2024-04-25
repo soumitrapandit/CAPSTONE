@@ -4,19 +4,23 @@
 %works. 
 
 %Lets Build the Z vector:
-
 N = 3;
-
 nstates = 8;
+ncontrols = 1;
+torque_limit = 6;
+u_lb = -torque_limit    ;
+u_ub = torque_limit;
 
-ncontrols = 2;
+%Initial Guess:
+Z0 = zeros(N*(nstates+ncontrols)+1);
 
-tf = 4; %4 seconds? Why 4 seconds?
+%Time Constraints:
+t_init = 0;
+t_final = 4;
+delta_t = 0.01;
+t_vec = t_init:delta_t:t_final;
 
 %Lets create the Z vectors
-%
-
-Z = zeros(nstates*N + ncontrols*N,1);
 
 
 %fmincon specific variables:
@@ -27,12 +31,17 @@ Aeq = [];
 beq = [];
 
 %Lets create the bounds
-lb = [-inf(nstates,1);-4;0];
+state_lb = -inf(N*nstates,1);
+state_ub = inf(N*nstates,1);
+controls_lb = u_lb*ones(N*ncontrols,1);
+controls_ub = u_ub*ones(N*ncontrols,1);
+alpha_lb = t_init;
+alpha_ub = t_final;
 
-ub = [inf(nstates,1);4;tf];
+lb = [state_lb;controls_lb;alpha_lb];
+ub = [state_ub;controls_ub;alpha_ub];
 
 %fmincon
-
 %x = fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon)
 
-x = fmincon(@objectiveFunction,zeros(10,1),Aeq,beq,lb,ub,@constraintFunction);
+%x = fmincon(@objectiveFunction,zeros(10,1),Aeq,beq,lb,ub,@constraintFunction);

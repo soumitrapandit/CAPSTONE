@@ -1,4 +1,4 @@
-function t_opt =  objectiveFunction(Z)
+function t_opt =  objectiveFunction(t,Z)
 %So we have all the states and the controls in this function
 %Why should this even work when the Z vector is not populated?
 %We're passing it as input to fmicon but isn't fmincon supposed to use it

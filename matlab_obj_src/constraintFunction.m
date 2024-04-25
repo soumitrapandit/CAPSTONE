@@ -1,11 +1,14 @@
-function [c,ceq] = constraintFunction(Z)
+function [c,ceq] = constraintFunction(t,Z)
+%There should be N-1 contraints for N states
+%No Inequality Contraints
 c = [];
+
+%We can define the equality contraints using the robot dynamics
 %ceq =  next_state - (current_state + delta_t * dynamics(current_state));
     nstates = 8;
     ncontrols = 2;
     N = size(Z)/(nstates+ncontrols);
     myBot = BipolarBot();
-    delta_t = 0.01;
     iter_step = nstates+ncontrols;
 
     for i = 1:iter_step:N*step_iter
