@@ -1,6 +1,5 @@
 %%READ ME FIRST:
 % x0 = initial state (all zeros)
-% u0 = initial guess for u (0,tfinal)
 % ui = optimization vector
 
 clc; clear; close all;
