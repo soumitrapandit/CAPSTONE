@@ -53,7 +53,7 @@ ui = fmincon(@(ui)shooting(x0, tspan, ti, ui,params), ...
     [], [], ... % A = [], b = []
     [], [], ... % Aeq = [], beq = []
     lb, ub, ...
-    [], ...
+    constraints(x0,tspan,ti,ui,params), ...
     options);
 
 % Solve ODE with optimized control
@@ -78,24 +78,11 @@ hold on
 plot(params.desired_pos(1), params.desired_pos(2), ...
     Marker="x", Color=[0 1]*lines(2), LineWidth=2);
 
+%norm(params.desired_pos - [0 0 0 0 1]*params.model.kinematics(x(end,:)'))
 
 
-%We also need a residual function:
-function res = shooting(x0,tspan,ti,ui,params)
-    [~, x] = ode45(@(t,x)params.model.dynamics(t, x, control(t, ti, ui)), tspan, x0);
-    xf = x(end,:)';
-    pos = params.model.kinematics(xf);
-    current_pos = pos(end,:);
-    res = norm(params.desired_pos - current_pos);% + norm(xf(5:8));
-end
 
-%And then we need a control Indexing Function which takes in t, ti, ui and
-%returns u
-function u = control(t,ti,ui)
-    tau = ui(sum(t>=ti));
-    a = t-ui(end,:);
-    u = [tau;a];
-end
+
 
 
 
