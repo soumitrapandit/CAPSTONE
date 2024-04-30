@@ -9,7 +9,7 @@ params = struct;
 params.model = model;
 params.ncontrols = 1;
 params.nstates = 8;
-params.N = 10; %here N is the number of controls "windows" we have
+%params.N = 10; %here N is the number of controls "windows" we have
 params.t_init = 0;
 params.t_delta = 0.01;
 params.t_final = 10;
@@ -21,27 +21,31 @@ params.desired_pos = [1, 0];
 params.outer_options = optimoptions('ga',...
     Display='iter');
 params.inner_options = optimoptions('fmincon',...
-    Algorithm='interior-point',...
+    Algorithm='sqp',...
     Display='off', ...
     MaxFunctionEvaluations=6000,...
     MaxIterations=200);
 
-x0 = zeros(8,1);
+x0 = [0; 0; -pi/2; 0; 0; 0; 0; 0];
 
 fval_min = inf;
 N_optimum = 0;
 
-for N = 2:10
+for N = 4:10
     t_final_min = 2;
     t_final_max = 7;
     [p, fval] = ga(@(t_final)outer_cost([t_final,N], params, x0), ...
-            2, ...
+            1, ...
             [], [], ... % A = [], b = []
             [], [], ... % Aeq = [], beq = []
-            t_final_min, t_final_max);
+            t_final_min, t_final_max, ...
+            [],...
+            [],...
+            params.outer_options);
     if fval < fval_min
         N_optimum = N;
         fval_min = fval;
+        fprintf("N optimum is being updated to %d\n",N_optimum);
     end
 end
 
@@ -49,11 +53,11 @@ params.t_final = p;
 params.N = N_optimum;
 
 tspan = [params.t_init, p(1)];
-ti = linspace(tspan(1), tspan(end), p(2))';
-ui = [zeros(p(2)*params.ncontrols,1); p(1)];
+ti = linspace(tspan(1), tspan(end), params.N)';
+ui = [zeros(params.N*params.ncontrols,1); p(1)];
 
-ub = [params.torque_limit*ones(p(2)*params.ncontrols,1);p(1)];
-lb = [-params.torque_limit*ones(p(2)*params.ncontrols,1);params.t_init];
+ub = [params.torque_limit*ones(params.N*params.ncontrols,1);p(1)];
+lb = [-params.torque_limit*ones(params.N*params.ncontrols,1);params.t_init];
 ui = fmincon(@(ui)inner_cost(x0, tspan, ti, ui, params), ...
         ui, ...
         [], [], ... % A = [], b = []

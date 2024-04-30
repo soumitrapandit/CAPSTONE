@@ -15,24 +15,26 @@ params.t_delta = 0.01;
 params.t_final = 10;
 params.torque_limit = 1;
 
+
 %Desired Pos:
 params.desired_pos = [1, 0];
 
 params.outer_options = optimoptions('ga',...
-    Display='iter');
+    Display='iter',...
+    FitnessLimit=0.1);
 params.inner_options = optimoptions('fmincon',...
     Algorithm='interior-point',...
     Display='off', ...
     MaxFunctionEvaluations=6000,...
     MaxIterations=200);
 
-x0 = zeros(8,1);
 
+x0 = [0;0;-pi/2;0;0;0;0;0];
 
 % p = [t_final, N]
 intcon = 2; % second index in p is an integer
-t_final_min = 2;
-t_final_max = 7;
+t_final_min = 1;
+t_final_max = 10;
 N_min = 2;
 N_max = 10;
 
@@ -42,7 +44,8 @@ p = ga(@(p)outer_cost(p, params, x0), ...
         [], [], ... % Aeq = [], beq = []
         [t_final_min; N_min], [t_final_max; N_max], ...
         [], ...
-        intcon);
+        intcon,...
+        params.outer_options);
 
 
 params.t_final = p(1);
@@ -62,7 +65,7 @@ ui = fmincon(@(ui)inner_cost(x0, tspan, ti, ui, params), ...
         [], ...
         params.inner_options);
 [t, x] = ode45(@(t,x)params.model.dynamics(t, x, control(t, ti, ui)), tspan, x0);
-% params.model.animate(t,x)
+params.model.animate(t,x)
 figure();
 for k=1:length(t)
     p(k,:) = [0 0 0 0 1]*params.model.kinematics(x(k,:)');
