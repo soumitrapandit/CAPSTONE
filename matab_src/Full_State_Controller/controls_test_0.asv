@@ -31,5 +31,15 @@ z = controlFunction(zeros(8,1),desired_pos,params);
 x = reshape(z(1:params.N*params.nstates),params.nstates, params.N)';
 %plot(t,x);
 
-model.animate(params.t,x);
+% nx = size(x);
+% for i = 1:nx(1)
+%     current_state = x(i,:);
+%     pos = params.model.kinematics(current_state);
+%     current_pos = pos(end,:);
+%     if norm(current_pos - desired_pos) < params.eps
+%         disp("found")
+%     end
+% end
+%
+  model.animate(params.t,x);
 
