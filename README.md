@@ -1,3 +1,4 @@
+![Poster Screenshot](https://github.com/user-attachments/assets/23814f46-ca83-4223-819b-1269ff71819e)
 # Design, Implementation and Analysis of Control Stack Elements
 
 This repository hosts research and implementations in advanced control systems, focusing on three key areas:
